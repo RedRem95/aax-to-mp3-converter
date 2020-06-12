@@ -1,0 +1,3 @@
+[submodule "converter/RainbowCrack/tables"]
+	path = converter/RainbowCrack/tables
+	url = https://github.com/inAudible-NG/tables

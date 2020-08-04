@@ -4,23 +4,21 @@ on:
   release:
     types:
       - created
-        
+
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@master
     - name: Build and Publish Docker
-      uses: docker/build-push-action@v1.1.0
+      uses: elgohr/Publish-Docker-Github-Action@2.19
       with:
+        name: redrem95/aax-to-mp3-web-converter/aax-to-mp3-web-converter
         username: ${{ github.actor }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-        repository: redrem95/aax-to-mp3-web-converter/aax-to-mp3-web-converter
         registry: docker.pkg.github.com
-        always_pull: true
         tags: "latest"
         tag_semver: true
         tag_names: true

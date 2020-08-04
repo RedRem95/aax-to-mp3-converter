@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+    <form method="post" action="/settings">
+        <ul class="list-group list-group-flush">
+            {% for setting_name, setting_value in settings.items() %}
+                <li class="form-group list-group-item">
+                    {% if isinstance(setting_value, bool) %}
+                        <input type="checkbox" class="form-check-input" id="input_{{ setting_name }}"
+                               {% if setting_value %}checked{% endif %} name="input_{{ setting_name }}">
+                        <label for="input_{{ setting_name }}">{{ get_config_descriptive_name(setting_name) }}</label>
+                    {% else %}
+                        <label for="input_{{ setting_name }}">{{ get_config_descriptive_name(setting_name) }}</label>
+                        <input type="text" class="form-control" id="input_{{ setting_name }}"
+                               value="{{ str(setting_value) }}" name="input_{{ setting_name }}">
+                    {% endif %}
+                    {% if not is_none(get_config_descriptions(setting_name)) %}
+                        <small id="{{ setting_name }}Help" class="form-text text-muted">
+                            {{ get_config_descriptions(setting_name) }}
+                        </small>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+        <input type="submit" class="btn btn-primary" id="run-conversions" name="run_selected"
+               value="Save settings">
+    </form>
+{% endblock %}

@@ -1,0 +1,8 @@
+{% extends "layout.html" %}
+{% block title %}{{ error_code }}{% endblock %}
+{% block content %}
+    <h1>Error {{ error_code }} - {{ error_name }}</h1>
+    <p>
+        {{ error_message }}
+    </p>
+{% endblock %}

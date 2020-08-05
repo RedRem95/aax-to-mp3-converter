@@ -21,4 +21,3 @@ jobs:
         registry: docker.pkg.github.com
         tags: "latest"
         tag_semver: true
-        tag_names: true

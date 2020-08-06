@@ -1,5 +1,5 @@
 FROM python:3-slim-buster
-RUN apt update && apt upgrade -y && apt install -y curl bash redis ffmpeg && rm -rf /var/lib/apt/lists/*
+RUN apt update && apt upgrade -y && apt install -y bash redis ffmpeg && rm -rf /var/lib/apt/lists/*
 RUN pip3 install --upgrade pip && pip3 install pipenv gunicorn
 RUN mkdir /media/in && mkdir /media/out && mkdir /media/config && mkdir /app
 

@@ -8,7 +8,7 @@ from os import listdir
 
 from config_path import ConfigPath
 
-VERSION = "0.9.0"
+VERSION = "0.9.1"
 
 __config = {
     "NAME": "AAX to Mp3 - Web converter",
@@ -122,7 +122,7 @@ def get_in_folder(session=None):
 def get_potential_audio_book_files(session=None):
     folder = get_in_folder(session)
     return [y for y in
-            (path_join(folder, x) for x in listdir(folder) if isfile(path_join(folder, x)) and x.endswith(".aax"))]
+            (path_join(folder, x) for x in listdir(folder) if isfile(path_join(folder, x)) and x.lower().endswith(".aax"))]
 
 
 def get_upload_name(session=None, file_name: str = None):

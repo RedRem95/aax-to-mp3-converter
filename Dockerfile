@@ -25,4 +25,4 @@ EXPOSE 8000
 
 WORKDIR /app/
 
-#CMD ["./run.sh"]
+CMD ["./run.sh"]

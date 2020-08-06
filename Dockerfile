@@ -1,4 +1,4 @@
-FROM python:3-buster
+FROM python:3-slim-buster
 RUN apt update && apt upgrade -y && apt install -y curl bash redis ffmpeg && rm -rf /var/lib/apt/lists/*
 RUN pip3 install --upgrade pip && pip3 install pipenv gunicorn
 RUN mkdir /media/in && mkdir /media/out && mkdir /media/config && mkdir /app
@@ -25,4 +25,4 @@ EXPOSE 8000
 
 WORKDIR /app/
 
-CMD ["./run.sh"]
+CMD ["bash", "./run.sh"]

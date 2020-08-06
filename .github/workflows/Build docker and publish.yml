@@ -25,5 +25,5 @@ jobs:
       - name: login to docker hub
         run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
       - name: build  and push the image
-        run: docker buildx build --push --tag redrem/aax-to-mp3-web-converter:latest --tag redrem/aax-to-mp3-web-converter:${{ steps.get_version_tag.outputs.VERSION }} --platform linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8,linux/ppc64le,linux/s390x .
+        run: docker buildx build --push --pull --tag redrem/aax-to-mp3-web-converter:latest --tag redrem/aax-to-mp3-web-converter:${{ steps.get_version_tag.outputs.VERSION }} --platform linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8,linux/ppc64le,linux/s390x .
 

@@ -7,6 +7,9 @@ RCRACK_DIR = environ.get("AC_RCRACK", path_join(dirname(abspath(__file__)), "tab
 
 
 def get_activation_bytes(checksum: str) -> str:
+
+    print(f"Getting activation on {checksum}")
+
     rcrack_process = Popen(["./rcrack", ".", "-h", checksum], stdout=PIPE, stderr=PIPE, cwd=RCRACK_DIR)
     rcrack_result = rcrack_process.communicate()[0]
 
@@ -15,4 +18,8 @@ def get_activation_bytes(checksum: str) -> str:
 
     rcrack_result = [x.strip() for x in rcrack_result.split(linesep) if len(x.strip()) > 0][-1]
 
-    return rcrack_result[re_search(r"hex:", rcrack_result).end():].strip()
+    rcrack_result = rcrack_result[re_search(r"hex:", rcrack_result).end():].strip()
+
+    print(f"Activation for {checksum} is {rcrack_result}")
+
+    return rcrack_result

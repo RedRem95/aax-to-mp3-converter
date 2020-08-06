@@ -1,6 +1,5 @@
-FROM alpine:latest
-RUN apk update && apk upgrade && apk add --no-cache bash python3 redis ffmpeg
-RUN python3 -m ensurepip
+FROM python:3-buster
+RUN apt update && apt upgrade -y && apt install -y curl bash redis ffmpeg && rm -rf /var/lib/apt/lists/*
 RUN pip3 install --upgrade pip && pip3 install pipenv gunicorn
 RUN mkdir /media/in && mkdir /media/out && mkdir /media/config && mkdir /app
 
@@ -26,4 +25,4 @@ EXPOSE 8000
 
 WORKDIR /app/
 
-CMD ["./run.sh"]
+#CMD ["./run.sh"]

@@ -83,8 +83,8 @@ __Software(
 )
 
 __Software(
-    name="inAudible-NG/tables",
-    homepage="https://github.com/inAudible-NG/tables",
+    name="inAudible-NG/RainbowCrack-NG",
+    homepage="https://github.com/inAudible-NG/RainbowCrack-NG",
     license_name="Custom license",
     license_page="https://github.com/inAudible-NG/tables/blob/master/README.md"
 )

@@ -12,8 +12,12 @@ jobs:
     steps:
       - name: checkout code
         uses: actions/checkout@master
-      - name: submodules-init
-        uses: snickerbockers/submodules-init@v4
+      - name: create rcrack space
+        run: mkdir converter/RainbowCrack/rcrack_tables
+      - name: download rainbowtables
+        uses: wei/curl@master
+        with:
+          args: -u ${{ secrets.FTP_BOTSCHMOT_USER }}:${{ secrets.FTP_BOTSCHMOT_PASSWORD }} --ssl 'ftp://botschmot.de/audible/Audible_Tables.zip' -o converter/RainbowCrack/rcrack_tables/Audible_Tables.zip
       - name: Get the version Tag
         id: get_version_tag
         run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}

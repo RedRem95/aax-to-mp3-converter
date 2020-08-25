@@ -4,6 +4,7 @@ import os
 import app.config as app_config
 from app.routes import init_routes
 from converter.AaxConverter import conversion_queue_running
+from converter.RainbowCrack import is_rcrack_enabled
 from misc import BytesConverter
 
 app = flask.Flask(__name__.split('.')[0],
@@ -31,5 +32,6 @@ def __context():
         queue_running=conversion_queue_running,
         get_session=lambda: flask.session if app_config.is_in_session_mode() else None,
         is_none=lambda x: x is None,
-        version=app_config.VERSION
+        version=app_config.VERSION,
+        is_rcrack_enabled=lambda: is_rcrack_enabled()
     )

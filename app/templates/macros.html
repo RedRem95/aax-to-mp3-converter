@@ -43,8 +43,10 @@
                         {{ Gear() }}
                     </a>
                     <div class="dropdown-menu" aria-labelledby="dropdown01">
-                        <a class="dropdown-item"
-                           href="/generate/activation/{{ audiobook.get_id() }}">Guess using rainbow-table</a>
+                        {% if is_rcrack_enabled() %}
+                            <a class="dropdown-item"
+                               href="/generate/activation/{{ audiobook.get_id() }}">Guess using rainbow-table</a>
+                        {% endif %}
                         <a class="dropdown-item" href="/generate/useforall/{{ audiobook.get_id() }}">Use for
                             all</a>
                     </div>

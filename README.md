@@ -33,7 +33,7 @@ You can also use every wsgi server by directing it to the app:app flask applicat
 * [Bootstrap icons](https://icons.getbootstrap.com) - Used icons
 * [Flask-Session](https://github.com/fengsp/flask-session) - Flask plugin to handle sessions. Only used in enabled session mode
 * [config-path](https://github.com/barry-scott/config-path) - application to find os-dependant paths for config files
-* [inAudible-NG/tables](https://github.com/inAudible-NG/tables) - Used to try and guess activation bytes
+* [inAudible-NG/RainbowCrack-NG](https://github.com/inAudible-NG/RainbowCrack-NG) - Used to try and guess activation bytes
 
 ## Versioning
 

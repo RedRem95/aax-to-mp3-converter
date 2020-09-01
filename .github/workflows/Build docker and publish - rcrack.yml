@@ -1,4 +1,4 @@
-name: Build docker and publish
+name: Build docker and publish - rcrack
 
 on:
   release:
@@ -29,5 +29,5 @@ jobs:
       - name: login to docker hub
         run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
       - name: build  and push the image
-        run: docker buildx build --push --pull --tag redrem/aax-to-mp3-web-converter:latest --tag redrem/aax-to-mp3-web-converter:${{ steps.get_version_tag.outputs.VERSION }} --platform linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8 .
+        run: docker buildx build --push --pull --tag redrem/aax-to-mp3-web-converter:${{ steps.get_version_tag.outputs.VERSION }}-rcrack --platform linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8 .
 

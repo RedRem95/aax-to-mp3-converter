@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: checkout code
         uses: actions/checkout@master
-     - name: Get the version Tag
+      - name: Get the version Tag
         id: get_version_tag
         run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
       - name: install buildx

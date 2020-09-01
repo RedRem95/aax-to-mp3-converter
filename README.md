@@ -1,4 +1,5 @@
-![Build docker and publish](https://github.com/RedRem95/aax-to-mp3-web-converter/workflows/Build%20docker%20and%20publish/badge.svg)
+![Build docker and publish - rcrack](https://github.com/RedRem95/aax-to-mp3-web-converter/workflows/Build%20docker%20and%20publish%20-%20rcrack/badge.svg)
+![Build docker and publish - no rcrack](https://github.com/RedRem95/aax-to-mp3-web-converter/workflows/Build%20docker%20and%20publish%20-%20no%20rcrack/badge.svg)
 # AAXtoMp3 - Web converter
 
 This project aims to let you easily convert your aax files to mp3.

@@ -8,7 +8,7 @@ from os import listdir
 
 from config_path import ConfigPath
 
-VERSION = "0.9.4"
+VERSION = "0.9.5"
 
 __config = {
     "NAME": "AAX to Mp3 - Web converter",

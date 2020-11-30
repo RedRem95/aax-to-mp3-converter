@@ -22,8 +22,10 @@ def get_activation_bytes(checksum: str) -> Optional[str]:
         return None
 
     print(f"Getting activation on {checksum}", flush=True)
+    has_rtc = len([x for x in listdir(RCRACK_DIR) if x.endswith(".rtc")]) > 0
+    rcrack_command = ["./rcrack", "." if has_rtc else "*.rt", "-h", checksum]
 
-    rcrack_process = Popen(["./rcrack", "*.rt", "-h", checksum], stdout=PIPE, stderr=PIPE, cwd=RCRACK_DIR)
+    rcrack_process = Popen(rcrack_command, stdout=PIPE, stderr=PIPE, cwd=RCRACK_DIR)
     rcrack_result = rcrack_process.communicate()[0]
 
     if isinstance(rcrack_result, bytes):

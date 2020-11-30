@@ -1,6 +1,9 @@
 import asyncio
-
+from typing import Optional, Callable, Any, Iterable, Mapping
+import time
 from werkzeug.routing import BaseConverter
+from threading import Thread
+from abc import ABC, abstractmethod
 
 
 class BytesConverter(BaseConverter):
@@ -28,3 +31,24 @@ class AtomicType:
     def set(self, value):
         self.__value = value
 
+
+class InterruptableThread(Thread, ABC):
+
+    def __init__(self, group: None = ..., target: Optional[Callable[..., Any]] = ..., name: Optional[str] = ...,
+                 args: Iterable[Any] = ..., kwargs: Mapping[str, Any] = ..., *, daemon: Optional[bool] = ...) -> None:
+        super().__init__(group, target, name, args, kwargs, daemon=daemon)
+        self.__run = True
+
+    def interrupt(self):
+        self.__run = False
+
+    def run(self) -> None:
+        if not hasattr(self, "__run"):
+            self.__run = True
+        while self.__run:
+            self.one_run()
+            time.sleep(1)
+
+    @abstractmethod
+    def one_run(self) -> None:
+        pass

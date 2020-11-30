@@ -1,8 +1,8 @@
 import flask
 import os
 
-import app.config as app_config
-from app.routes import init_routes
+import webapp.config as app_config
+from webapp.routes import init_routes
 from converter.AaxConverter import conversion_queue_running
 from converter.RainbowCrack import is_rcrack_enabled
 from misc import BytesConverter

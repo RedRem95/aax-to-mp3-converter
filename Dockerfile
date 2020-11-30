@@ -13,7 +13,7 @@ RUN chmod a+x /app/run.sh
 
 COPY docker_config.json /media/config/config.json
 COPY main.py /app/main.py
-COPY app /app/app/
+COPY webapp /app/app/
 COPY converter/ /app/converter/
 COPY misc/ /app/misc/
 

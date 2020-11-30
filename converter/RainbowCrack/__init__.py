@@ -11,7 +11,7 @@ def is_rcrack_enabled() -> bool:
     if RCRACK_DIR is not None and isdir(RCRACK_DIR):
         if isfile(path_join(RCRACK_DIR, "rcrack")):
             for file in listdir(RCRACK_DIR):
-                if file.endswith(".rt"):
+                if file.endswith(".rt") or file.endswith(".rtc"):
                     return True
     return False
 

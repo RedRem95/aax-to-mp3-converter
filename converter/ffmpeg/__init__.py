@@ -7,7 +7,7 @@ import platform
 from typing import AnyStr, Tuple, Optional, List, Generator, Iterable, Dict
 from json import loads as loads_json
 from converter.RainbowCrack import get_activation_bytes
-import app.config as app_config
+import webapp.config as app_config
 
 FFPROBE_COMMAND = environ.get("AC_FFPROBE", "ffprobe.exe" if platform.system().lower() == "windows" else "ffprobe")
 FFMPEG_COMMAND = environ.get("AC_FFMPEG", "ffmpeg.exe" if platform.system().lower() == "windows" else "ffmpeg")

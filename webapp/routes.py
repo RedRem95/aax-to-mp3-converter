@@ -3,7 +3,7 @@ import json
 
 from converter.AaxConverter import add_audiobook_to_queue, conversion_queue_running
 from converter.ffmpeg import get_audiobook_file as gaf, generate_bytes_by_id, use_for_all_for_id, get_audiobook_by_id
-from app.config import get_editable_config, get_upload_name, is_in_session_mode, \
+from webapp.config import get_editable_config, get_upload_name, is_in_session_mode, \
     get_potential_audio_book_files as gpabf, set_config_value, save_file_config, get_config_descriptive_name, \
     get_config_descriptions
 from misc.software import get_used_software

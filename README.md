@@ -29,7 +29,7 @@ Then if it is a *.aax file convert it to mp3 and copy it inside the target folde
 The structure is ``<artist>/<album>/<title>.mp3`` per default. If the conversion and copy succeeded the original file in the watch folder will be deleted.
 Also a cover will be saved in the same directory.
 
-#####Example
+##### Example
 
 ``` shell script
 docker run redrem/aax-to-mp3-converter:latest watch -w /path/to/input -t /path/to/output
@@ -46,7 +46,7 @@ Also a cover will be uploaded in the same directory.
 
 Also you have to define the owncloud-instance, username and password so the script has access to the files.
 
-#####Example
+##### Example
 
 ``` shell script
 docker run redrem/aax-to-mp3-converter:latest owncloud -w /path/to/input -t /path/to/output -u username -p password  -host owncloud.yourdomain.com

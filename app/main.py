@@ -1,5 +1,6 @@
+from version import get_version as version
 import argparse
-from typing import Optional, Callable, List
+from typing import Callable, List
 import misc.logging as logging
 from misc.logging.notifications import APPRISE_SUPPORTED_FORMATS_URL
 from misc import InterruptableRepeatingThread
@@ -7,7 +8,7 @@ from misc import InterruptableRepeatingThread
 if __name__ == '__main__':
 
     main_parser = argparse.ArgumentParser(prog='AAXtoMP3')
-    start_mode_parser = main_parser.add_subparsers(help='Modes this program can start as', required=True,
+    start_mode_parser = main_parser.add_subparsers(help='Modes this program can start as', required=False,
                                                    title="Start modes")
     auto_watcher = start_mode_parser.add_parser("watch", help="Start watch on a folder and convert every item inside. "
                                                               "Deletes after conversion")
@@ -15,7 +16,9 @@ if __name__ == '__main__':
                                                     help="Start watch on owncloud and convert every item inside. "
                                                          "Deletes after conversion")
 
-    main_parser.add_argument("-d", "--debug", dest="debug", action='store_true',
+    main_parser.add_argument("-v", "--version", dest="show_version", action='store_true', required=False,
+                             help="Show current version")
+    main_parser.add_argument("-d", "--debug", dest="debug", action='store_true', required=False,
                              help="Set the port for the webinterface")
 
     _notification_enabled_parser = [auto_watcher, owncloud_watcher]
@@ -42,6 +45,10 @@ if __name__ == '__main__':
                                   help=f"Owncloud host url")
 
     args = main_parser.parse_args()
+
+    if args.show_version:
+        print(f"Version: {version()}")
+        exit(0)
 
     if args.debug:
         logging.set_commandline_level(logging.DEBUG_LEVEL)

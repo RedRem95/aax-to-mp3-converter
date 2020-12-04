@@ -26,14 +26,9 @@ You can also use every wsgi server by directing it to the app:app flask applicat
 
 ## Built With
 
-* [Flask](https://flask.palletsprojects.com) - The web framework used
 * [pipenv](https://github.com/pypa/pipenv) - Dependency Management
-* [Bootstrap](https://getbootstrap.com) - Used HTML, CSS and JS library
-* [jQuery](https://jquery.com/) - Used JS library
-* [Bootstrap icons](https://icons.getbootstrap.com) - Used icons
-* [Flask-Session](https://github.com/fengsp/flask-session) - Flask plugin to handle sessions. Only used in enabled session mode
-* [config-path](https://github.com/barry-scott/config-path) - application to find os-dependant paths for config files
-* [inAudible-NG/RainbowCrack-NG](https://github.com/inAudible-NG/RainbowCrack-NG) - Used to try and guess activation bytes
+* [inAudible-NG/tables](https://github.com/inAudible-NG/tables.git) - Used to try and guess activation bytes
+* [pyocclient](https://github.com/owncloud/pyocclient) - Used to connect to owncloud if thats wanted
 
 ## Versioning
 
@@ -45,5 +40,5 @@ We use [SemVer](http://semver.org/) for versioning.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
+This project is licensed under the GPL-3 License - see the [LICENSE](LICENSE) file for details
 

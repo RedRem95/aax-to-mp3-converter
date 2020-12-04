@@ -1,5 +1,5 @@
 import hashlib
-from os import environ, linesep, remove
+from os import environ, linesep
 from os.path import isfile, abspath, join as path_join
 from re import compile as regex_compile
 from subprocess import PIPE, Popen
@@ -7,7 +7,7 @@ import platform
 from typing import AnyStr, Tuple, Optional, List, Generator, Iterable, Dict
 from json import loads as loads_json
 from converter.RainbowCrack import get_activation_bytes
-import app.config as app_config
+import misc.logging as logging
 
 FFPROBE_COMMAND = environ.get("AC_FFPROBE", "ffprobe.exe" if platform.system().lower() == "windows" else "ffprobe")
 FFMPEG_COMMAND = environ.get("AC_FFMPEG", "ffmpeg.exe" if platform.system().lower() == "windows" else "ffmpeg")
@@ -53,14 +53,15 @@ def ffmpeg(input_file: str, output_file: str, activation_bytes: str, quality_lev
     if isinstance(format, str):
         ffmpeg_process = ffmpeg_process + ["-f", format]
     ffmpeg_process = ffmpeg_process + [output_file]
-    print(f"Executing ffmpeg process {' '.join(str(x) for x in ffmpeg_process)}")
+    logging.debug(f"Executing ffmpeg process {' '.join(str(x) for x in ffmpeg_process)}")
     ffmpeg_process = Popen([str(x) for x in ffmpeg_process], stdout=PIPE, stderr=PIPE)
     ffmpeg_process.communicate()
     return ffmpeg_process.returncode == 0
 
 
 def get_cover(input_file: str, output_file: str):
-    ffmpeg_process = Popen([FFMPEG_COMMAND, "-i", input_file, "-an", "-vcodec", "copy", output_file])
+    ffmpeg_process = Popen([FFMPEG_COMMAND, "-i", input_file, "-an", "-vcodec", "copy", output_file], stdout=PIPE, stderr=PIPE)
+    ffmpeg_process.communicate()
 
 
 class AudioBookChapter:
@@ -85,7 +86,7 @@ class AudioBookChapter:
         return dict(self.__other_tags)
 
     def __str__(self) -> str:
-        return f"Chapter \"{self.get_title()}\" from {self.get_start()} to {self.get_end()}"
+        return f"Audiobook-Chapter<\"{self.get_title()}\" from {self.get_start()} to {self.get_end()}>"
 
 
 class AudioBook:
@@ -113,7 +114,7 @@ class AudioBook:
         return self.__album_artist
 
     def get_sure_artist(self) -> str:
-        return self.get_artist() or self.get_album_artist()
+        return self.get_album_artist() if self.get_artist() is None else self.get_artist()
 
     def get_album(self) -> str:
         return self.__album
@@ -155,30 +156,28 @@ class AudioBook:
         return self.__checksum
 
     def generate_activation_bytes(self) -> str:
+        logging.debug(f"Generating activation bytes for {self}")
         self.set_activation_bytes(get_activation_bytes(self.get_checksum()))
         return self.get_activation_bytes()
 
     def get_activation_bytes(self, create_if_missing: bool = False) -> str:
-        if not self.__activation_bytes and create_if_missing:
+        if self.__activation_bytes is None and create_if_missing:
             return self.generate_activation_bytes()
         return self.__activation_bytes
 
     def set_activation_bytes(self, activation_bytes: str):
         self.__activation_bytes = activation_bytes
 
-    def get_output_name(self):
-        ret = str(app_config.get_config_value("OUTPUT_TEMPLATE")).format(
+    def get_output_name(self, template: str):
+        return template.format(
             artist=self.get_sure_artist() or "",
             title=self.get_title() or "",
             album=self.get_album() or "",
             album_artist=self.get_album_artist() or ""
         )
-        if not ret.endswith(".mp3"):
-            ret = f"{ret}.mp3"
-        return ret
 
-    def get_whole_target_path(self, session=None):
-        return path_join(app_config.get_out_folder(session), self.get_output_name())
+    def get_whole_target_path(self, output_folder: str, name_template: str):
+        return path_join(output_folder, self.get_output_name(name_template))
 
     def get_input_file(self):
         return self.__file_path
@@ -207,7 +206,7 @@ class AudioBook:
         return AudioBook.hash_filename(self.__file_path)
 
     def __str__(self):
-        return f"{self.get_title()} by {self.get_artist()}"
+        return f"Audiobook<{self.get_title()} by {self.get_artist()}>"
 
     @staticmethod
     def hash_filename(file_path: str) -> str:
@@ -217,10 +216,10 @@ class AudioBook:
 __audio_books: Dict[str, AudioBook] = dict()
 
 
-def get_audiobook_file(file: str) -> Optional[AudioBook]:
+def get_audiobook_by_file(file: str, add_to_hashtable: bool = False) -> Optional[AudioBook]:
     file = abspath(file)
     ab_hash = AudioBook.hash_filename(file)
-    if ab_hash in __audio_books:
+    if ab_hash in __audio_books and add_to_hashtable:
         return __audio_books[ab_hash]
     ffprobe_result = ffprobe(file, ffprobe_commands=["-show_format", "-show_chapters", "-print_format", "json",
                                                      "-hide_banner", "-v", "quiet"])
@@ -240,14 +239,15 @@ def get_audiobook_file(file: str) -> Optional[AudioBook]:
                                     for i, chapter in enumerate(sorted(ffprobe_result.get("chapters", []),
                                                                        key=lambda x: int(x["start"]))))
                            )
-        __audio_books[new_ab.hash_string()] = new_ab
+        if add_to_hashtable:
+            __audio_books[new_ab.hash_string()] = new_ab
         return new_ab
 
     return None
 
 
-def is_audiobook_allowed(audiobook_id: str, session=None) -> bool:
-    return audiobook_id in [AudioBook.hash_filename(x) for x in app_config.get_potential_audio_book_files(session)]
+def is_audiobook_allowed(audiobook_id: str, potential_audiobooks: Iterable[str]) -> bool:
+    return audiobook_id in [AudioBook.hash_filename(x) for x in potential_audiobooks]
 
 
 def get_audiobook_by_id(audiobook_id: str, session=None) -> Optional[AudioBook]:
@@ -261,13 +261,13 @@ def generate_bytes_by_id(audiobook_id: str, session=None):
         __audio_books[audiobook_id].generate_activation_bytes()
 
 
-def use_for_all_for_id(audiobook_id: str, session=None):
+def use_for_all_for_id(audiobook_id: str, potential_audiobooks: Iterable[str]):
     if is_audiobook_allowed(audiobook_id) and audiobook_id in __audio_books:
         activation_bytes = __audio_books[audiobook_id].get_activation_bytes(False)
-        for book_id in (AudioBook.hash_filename(x) for x in app_config.get_potential_audio_book_files(session)):
+        for book_id in (AudioBook.hash_filename(x) for x in potential_audiobooks):
             if book_id in __audio_books:
                 __audio_books[book_id].set_activation_bytes(activation_bytes)
 
 
 def get_chapters(file: str) -> Generator[AudioBookChapter, None, None]:
-    return get_audiobook_file(file).iterate_chapters()
+    return get_audiobook_by_file(file).iterate_chapters()

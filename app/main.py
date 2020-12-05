@@ -28,6 +28,11 @@ if __name__ == '__main__':
                              required=False, help=f"Set urls for apprise to send notifications. "
                                                   f"See \"{APPRISE_SUPPORTED_FORMATS_URL}\" for supported urls")
 
+    _scanning_parser = [auto_watcher, owncloud_watcher]
+    for _parser in _scanning_parser:
+        _parser.add_argument("-i", "--interval", dest="scanning_interval", metavar="INTERVAL", required=False, type=int,
+                             help="Set interval to search for new files if none was found")
+
     auto_watcher.add_argument("-w", "--watch", dest="watch_orig", type=str, required=True,
                               help="Set path to watch and get files from")
     auto_watcher.add_argument("-t", "--target", dest="watch_dest", type=str, required=True,
@@ -64,10 +69,11 @@ if __name__ == '__main__':
     def watch_app_creator(_args: argparse.Namespace) -> InterruptableRepeatingThread:
         _watch_folder = args.watch_orig
         _destination_folder = args.watch_dest
+        _interval = args.scanning_interval
         from watchapp import WatchingApp
 
         return WatchingApp(watch_folder=_watch_folder, target_folder=_destination_folder, debug=_args.debug,
-                           recursive=False)
+                           recursive=False, scanning_interval=_interval)
 
 
     def owncloud_app_creator(_args: argparse.Namespace) -> InterruptableRepeatingThread:
@@ -76,10 +82,11 @@ if __name__ == '__main__':
         _watch_folder = args.owncloud_orig
         _destination_folder = args.owncloud_dest
         _host = args.owncloud_host
+        _interval = args.scanning_interval
         from owncloudapp import OwncloudApp
 
         return OwncloudApp(watch_folder=_watch_folder, destination_folder=_destination_folder, username=_username,
-                           password=_password, host=_host, debug=_args.debug)
+                           password=_password, host=_host, debug=_args.debug, scanning_interval=_interval)
 
     apps: List[InterruptableRepeatingThread] = []
     for _creator in [watch_app_creator, owncloud_app_creator]:

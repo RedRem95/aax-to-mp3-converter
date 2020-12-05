@@ -13,19 +13,19 @@ import misc.logging as logging
 class WatchingApp(InterruptableRepeatingThread):
 
     def __init__(self, watch_folder: str, target_folder: str, thread_name="Main thread of folder watcher",
-                 recursive: bool = False, debug: bool = False):
-        super().__init__(daemon=True, name=thread_name, time_out=1)
+                 recursive: bool = False, debug: bool = False, scanning_interval: int = 1):
+        super().__init__(daemon=True, name=thread_name, time_out=scanning_interval)
         self._watch_folder = watch_folder
         self._target_folder = target_folder
         self._recursive = recursive
         self._debug = debug
         logging.info(f"Starting watch on \"{watch_folder}\" as {self.__class__.__name__}")
 
-    def one_run(self) -> None:
+    def one_run(self) -> bool:
         all_files = self.get_file_list(current_element=self._watch_folder, recursive=self._recursive)
         all_files = [x for x in all_files if x.lower().endswith(".aax") or x.lower().endswith(".mp3")]
         if len(all_files) <= 0:
-            return
+            return False
         work_file = self.prepare_file(selected_file=all_files[0])
         audiobook = get_audiobook_by_file(work_file)
         cover = audiobook.get_cover()
@@ -37,6 +37,7 @@ class WatchingApp(InterruptableRepeatingThread):
         logging.notify(message=f"Conversion of {audiobook} initiated", extra=_extra)
         _ = audiobook.get_activation_bytes(create_if_missing=True)
         converted_file = simple_conversion(audiobook=audiobook, target_path=f"{work_file}.mp3")
+        logging.debug(message=f"Conversion of {audiobook} finished. Saved to \"{converted_file}\"")
         if not self.finalize_file(final_file=converted_file, audiobook=audiobook, target_folder=self._target_folder):
             logging.info(f"Finalization of {audiobook} failed")
             logging.notify(message=f"Conversion of {audiobook} failed",
@@ -47,6 +48,7 @@ class WatchingApp(InterruptableRepeatingThread):
             logging.success(message=f"Conversion and upload of {audiobook} failed",
                             extra={"notification_title": "Conversion successful"})
             self.cleanup(audiobook=audiobook, final_file=converted_file, selected_file=all_files[0])
+        return True
 
     def get_file_list(self, current_element: str, recursive: bool) -> List[str]:
         if os.path.isfile(current_element):
@@ -79,7 +81,13 @@ class WatchingApp(InterruptableRepeatingThread):
 
     # noinspection PyMethodMayBeStatic
     def stale_input(self, selected_input: str):
-        os.rename(src=selected_input, dst=f"{selected_input}.failed")
+        stale_template = "{selected_input}.failed{i}"
+        stale_name = stale_template.format(selected_input=selected_input, i="")
+        i = 0
+        while os.path.exists(stale_name):
+            i += 1
+            stale_name = stale_template.format(selected_input=selected_input, i=f"_{i}")
+        os.rename(src=selected_input, dst=stale_name)
 
     # noinspection PyMethodMayBeStatic
     def cleanup(self, audiobook: AudioBook, final_file: Optional[str], selected_file: Optional[str]):

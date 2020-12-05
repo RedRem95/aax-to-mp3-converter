@@ -12,9 +12,9 @@ import misc.logging as logging
 class OwncloudApp(WatchingApp):
 
     def __init__(self, username: str, password: str, watch_folder: str, destination_folder: str, host: str,
-                 debug: bool = False,):
+                 debug: bool = False, scanning_interval: int = 1):
         super().__init__(watch_folder=watch_folder, target_folder=destination_folder, debug=debug, recursive=False,
-                         thread_name="Main thread of owncloud watcher")
+                         thread_name="Main thread of owncloud watcher", scanning_interval=scanning_interval)
         self._username = username
         self._host = host
         self._oc = owncloud.Client(host)
@@ -54,24 +54,37 @@ class OwncloudApp(WatchingApp):
             pass
 
     def stale_input(self, selected_input: str):
+        stale_template = "{selected_input}.failed{i}"
+        stale_name = stale_template.format(selected_input=selected_input, i="")
+        i = 0
+        while self._exists(stale_name):
+            i += 1
+            stale_name = stale_template.format(selected_input=selected_input, i=f"_{i}")
         try:
-            self._oc.move(remote_path_source=selected_input, remote_path_target=f"{selected_input}.failed")
+            self._oc.move(remote_path_source=selected_input, remote_path_target=stale_name)
         except owncloud.owncloud.HTTPResponseError:
             pass
 
-    def finalize_file(self, final_file: str, audiobook: AudioBook, target_folder: str) -> bool:
-        target_file = audiobook.get_whole_target_path(output_folder=target_folder, name_template=self.get_template())
+    def _exists(self, path: str):
         try:
-            _ = self._oc.file_info(target_file)
-            return False
+            _ = self._oc.file_info(path=path)
+            return True
         except owncloud.owncloud.HTTPResponseError as e:
             if e.status_code != 404:
-                return False
+                return True
+        return False
+
+    def finalize_file(self, final_file: str, audiobook: AudioBook, target_folder: str) -> bool:
+        if final_file is None:
+            return False
+        target_file = audiobook.get_whole_target_path(output_folder=target_folder, name_template=self.get_template())
+        if self._exists(target_file):
+            return False
         self.__mkdir_recursive(os.path.dirname(target_file).split("/"))
-        logging.info(f"Starting upload of {audiobook} to {target_file} on {self._host}")
+        logging.info(f"Starting upload of {audiobook} to \"{target_file}\" on {self._host}")
         self._oc.put_file(remote_path=target_file, local_source_file=final_file)
         self._oc.put_file(remote_path=f"{target_file}.jpg", local_source_file=audiobook.get_cover())
-        logging.info(f"Finished upload of {audiobook} to {target_file} on {self._host}")
+        logging.info(f"Finished upload of {audiobook} to \"{target_file}\" on {self._host}")
         return True
 
 

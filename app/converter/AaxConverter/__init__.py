@@ -1,16 +1,7 @@
-from queue import Queue
-from threading import Thread
 from os import rename, remove
 
 from converter.ffmpeg import AudioBook, ffmpeg
-from misc import AtomicType
 import misc.logging as logging
-
-__in_conversion_atomic_data = AtomicType(False)
-
-
-def in_conversion_atomic():
-    return __in_conversion_atomic_data
 
 
 def simple_conversion(audiobook: AudioBook, target_path: str):
@@ -30,48 +21,6 @@ def simple_conversion(audiobook: AudioBook, target_path: str):
         else:
             remove(temporary_out_name)
         return target_path
-    finally:
-        return None
-
-
-class __ConverionJob:
-
-    def __init__(self, audiobook: AudioBook, session=None):
-        self.__audiobook = audiobook
-        self.__session = session
-
-    def run_job(self):
-        raise NotImplementedError("Not reimplemented after Converter redesign")
-        in_conversion_atomic().set(True)
-        logging.notify(f"Starting conversion of {self.__audiobook}")
-        if self.__audiobook.already_converted(self.__session):
-            return
-        temporary_out_name = f"{self.__audiobook.get_whole_target_path(self.__session)}.conv"
-        simple_conversion(self.__audiobook, target_path=self.__audiobook.get_whole_target_path(session=self.__session))
-        in_conversion_atomic().set(False)
-
-
-__conversion_queue: "Queue[__ConverionJob]" = Queue()
-
-
-def conversion_queue_empty():
-    return __conversion_queue.empty()
-
-
-def conversion_queue_running():
-    return (not conversion_queue_empty()) or in_conversion_atomic().get()
-
-
-def add_audiobook_to_queue(audiobook: AudioBook, session=None):
-    if audiobook and not audiobook.already_converted(session):
-        __conversion_queue.put(__ConverionJob(audiobook, session))
-
-
-def __run_conversion_thread():
-    while True:
-        job = __conversion_queue.get()
-        job.run_job()
-
-
-__worker_thread = Thread(daemon=True, name="conversion", target=__run_conversion_thread)
-__worker_thread.start()
+    except:
+        pass
+    return None

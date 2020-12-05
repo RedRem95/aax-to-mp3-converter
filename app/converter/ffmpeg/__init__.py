@@ -206,7 +206,7 @@ class AudioBook:
         return AudioBook.hash_filename(self.__file_path)
 
     def __str__(self):
-        return f"Audiobook<{self.get_title()} by {self.get_artist()}>"
+        return f"Audiobook<'{self.get_title()}' by {self.get_artist()}>"
 
     @staticmethod
     def hash_filename(file_path: str) -> str:

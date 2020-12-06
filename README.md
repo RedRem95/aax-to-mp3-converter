@@ -1,3 +1,9 @@
+![Docker Automated build](https://img.shields.io/docker/automated/redrem/aax-to-mp3-converter?style=flat-square)
+![Docker Build Status](https://img.shields.io/docker/build/redrem/aax-to-mp3-converter?style=flat-square)
+
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/redrem95/aax-to-mp3-converter?label=github&sort=semver&style=flat-square)](https://github.com/RedRem95/aax-to-mp3-converter)
+[![Docker Image Version (latest semver)](https://img.shields.io/docker/v/redrem/aax-to-mp3-converter?label=dockerhub&sort=semver&style=flat-square)](https://hub.docker.com/repository/docker/redrem/aax-to-mp3-converter)
+
 # AAXtoMp3 - converter
 
 This project aims to let you easily convert your aax files to mp3.
@@ -61,7 +67,7 @@ docker run redrem/aax-to-mp3-converter:latest owncloud -w /path/to/input -t /pat
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. 
+Uses [SemVer](http://semver.org/) for versioning. 
 
 ## Authors
 

@@ -28,6 +28,10 @@ class WatchingApp(InterruptableRepeatingThread):
             return False
         work_file = self.prepare_file(selected_file=all_files[0])
         audiobook = get_audiobook_by_file(work_file)
+        if self.audiobook_already_exists(audiobook=audiobook, target_folder=self._target_folder) is None:
+            logging.info(f"Audiobook {audiobook} already exists. Deleting and carrying on")
+            self.cleanup(audiobook=audiobook, final_file=None, selected_file=all_files[0])
+            return True
         cover = audiobook.get_cover()
 
         _extra = {"notification_title": "Conversion started"}
@@ -45,10 +49,19 @@ class WatchingApp(InterruptableRepeatingThread):
             self.stale_input(selected_input=all_files[0])
         else:
             logging.info(f"Finalization of {audiobook} succeeded. Going to clean up")
-            logging.success(message=f"Conversion and upload of {audiobook} failed",
+            logging.success(message=f"Conversion and upload of {audiobook} secceded",
                             extra={"notification_title": "Conversion successful"})
             self.cleanup(audiobook=audiobook, final_file=converted_file, selected_file=all_files[0])
         return True
+
+    def audiobook_already_exists(self, audiobook: AudioBook, target_folder: str) -> Optional[str]:
+        target_file = audiobook.get_whole_target_path(output_folder=target_folder, name_template=self.get_template())
+        if self.exists(path=target_file):
+            return None
+        return target_file
+
+    def exists(self, path: str) -> bool:
+        return os.path.exists(path=path)
 
     def get_file_list(self, current_element: str, recursive: bool) -> List[str]:
         if os.path.isfile(current_element):
@@ -96,10 +109,8 @@ class WatchingApp(InterruptableRepeatingThread):
                 os.remove(to_remove)
 
     def finalize_file(self, final_file: str, audiobook: AudioBook, target_folder: str) -> bool:
-        if final_file is None:
-            return False
-        target_file = audiobook.get_whole_target_path(output_folder=target_folder, name_template=self.get_template())
-        if os.path.exists(target_file):
+        target_file = self.audiobook_already_exists(audiobook=audiobook, target_folder=target_folder)
+        if final_file is None or target_file is None:
             return False
         os.makedirs(os.path.dirname(target_file), exist_ok=True)
         shutil.move(src=final_file, dst=target_file)

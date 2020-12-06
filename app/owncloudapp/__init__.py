@@ -57,7 +57,7 @@ class OwncloudApp(WatchingApp):
         stale_template = "{selected_input}.failed{i}"
         stale_name = stale_template.format(selected_input=selected_input, i="")
         i = 0
-        while self._exists(stale_name):
+        while self.exists(stale_name):
             i += 1
             stale_name = stale_template.format(selected_input=selected_input, i=f"_{i}")
         try:
@@ -65,7 +65,7 @@ class OwncloudApp(WatchingApp):
         except owncloud.owncloud.HTTPResponseError:
             pass
 
-    def _exists(self, path: str):
+    def exists(self, path: str):
         try:
             _ = self._oc.file_info(path=path)
             return True
@@ -75,10 +75,8 @@ class OwncloudApp(WatchingApp):
         return False
 
     def finalize_file(self, final_file: str, audiobook: AudioBook, target_folder: str) -> bool:
-        if final_file is None:
-            return False
-        target_file = audiobook.get_whole_target_path(output_folder=target_folder, name_template=self.get_template())
-        if self._exists(target_file):
+        target_file = self.audiobook_already_exists(audiobook=audiobook, target_folder=target_folder)
+        if final_file is None or target_file is None:
             return False
         self.__mkdir_recursive(os.path.dirname(target_file).split("/"))
         logging.info(f"Starting upload of {audiobook} to \"{target_file}\" on {self._host}")

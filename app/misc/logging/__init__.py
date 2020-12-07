@@ -1,5 +1,6 @@
 import logging
 from typing import Optional, Dict, Any
+import sys
 
 from misc.logging.notifications import NotificationHandler, NOTIFICATION_LEVEL, SUCCESS_LEVEL
 from logging import CRITICAL as CRITICAL_LEVEL, FATAL as FATAL_LEVEL, ERROR as ERROR_LEVEL, WARNING as WARNING_LEVEL
@@ -27,7 +28,7 @@ class TracebackInfoFilter(logging.Filter):
 logging.basicConfig(level=logging.DEBUG)
 _logger = logging.getLogger()
 _logger.handlers = []
-_logger_handler = logging.StreamHandler()
+_logger_handler = logging.StreamHandler(stream=sys.stdout)
 _logger_handler.setFormatter(
     logging.Formatter(
         f"%(threadName)-25s - %(asctime)s - [%(levelname)-12s] - %(message)s",

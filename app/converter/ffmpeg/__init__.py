@@ -8,6 +8,7 @@ from typing import AnyStr, Tuple, Optional, List, Generator, Iterable, Dict
 from json import loads as loads_json
 from converter.RainbowCrack import get_activation_bytes
 import misc.logging as logging
+from pathvalidate import sanitize_filepath
 
 FFPROBE_COMMAND = environ.get("AC_FFPROBE", "ffprobe.exe" if platform.system().lower() == "windows" else "ffprobe")
 FFMPEG_COMMAND = environ.get("AC_FFMPEG", "ffmpeg.exe" if platform.system().lower() == "windows" else "ffmpeg")
@@ -177,7 +178,7 @@ class AudioBook:
         )
 
     def get_whole_target_path(self, output_folder: str, name_template: str):
-        return path_join(output_folder, self.get_output_name(name_template))
+        return sanitize_filepath(path_join(output_folder, self.get_output_name(name_template)))
 
     def get_input_file(self):
         return self.__file_path
@@ -187,9 +188,6 @@ class AudioBook:
         if not isfile(cover_file):
             get_cover(self.__file_path, cover_file)
         return cover_file if isfile(cover_file) else None
-
-    def already_converted(self, session=None) -> bool:
-        return isfile(self.get_whole_target_path(session))
 
     def get_id(self) -> str:
         return self.hash_string()

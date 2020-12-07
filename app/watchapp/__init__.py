@@ -39,7 +39,10 @@ class WatchingApp(InterruptableRepeatingThread):
             _extra["audiobook_cover"] = cover
 
         logging.notify(message=f"Conversion of {audiobook} initiated", extra=_extra)
-        _ = audiobook.get_activation_bytes(create_if_missing=True)
+        try:
+            _ = audiobook.get_activation_bytes(create_if_missing=True)
+        except TypeError:
+            pass
         converted_file = simple_conversion(audiobook=audiobook, target_path=f"{work_file}.mp3")
         logging.debug(message=f"Conversion of {audiobook} finished. Saved to \"{converted_file}\"")
         if not self.finalize_file(final_file=converted_file, audiobook=audiobook, target_folder=self._target_folder):
@@ -114,5 +117,6 @@ class WatchingApp(InterruptableRepeatingThread):
             return False
         os.makedirs(os.path.dirname(target_file), exist_ok=True)
         shutil.move(src=final_file, dst=target_file)
-        shutil.move(src=audiobook.get_cover(), dst=f"{target_file}.jpg")
+        if audiobook.get_cover() is not None:
+            shutil.move(src=audiobook.get_cover(), dst=f"{target_file}.jpg")
         return True

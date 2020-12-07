@@ -9,6 +9,8 @@ verify_ssl = true
 pyocclient = "*"
 apprise = "*"
 pathvalidate = '*'
+mutagen = '*'
+python-magic = '*'
 
 [requires]
 python_version = "3.8"

@@ -8,7 +8,7 @@ from typing import AnyStr, Tuple, Optional, List, Generator, Iterable, Dict
 from json import loads as loads_json
 from converter.RainbowCrack import get_activation_bytes
 import misc.logging as logging
-from pathvalidate import sanitize_filepath
+from pathvalidate import sanitize_filepath, sanitize_filename
 
 FFPROBE_COMMAND = environ.get("AC_FFPROBE", "ffprobe.exe" if platform.system().lower() == "windows" else "ffprobe")
 FFMPEG_COMMAND = environ.get("AC_FFMPEG", "ffmpeg.exe" if platform.system().lower() == "windows" else "ffmpeg")
@@ -40,29 +40,57 @@ def get_checksum(file: str) -> Optional[AnyStr]:
     return None
 
 
-def ffmpeg(input_file: str, output_file: str, activation_bytes: str, quality_level: int = 5,
-           format: str = None, cover_file: str = None) -> bool:
+def ffmpeg(input_file: str, output_file: str, activation_bytes: Optional[str] = None, quality_level: int = 5,
+           output_format: str = None) -> bool:
     if not isfile(input_file) or isfile(output_file):
         return False
-    ffmpeg_process = [FFMPEG_COMMAND, "-activation_bytes", activation_bytes, "-i", input_file]
-    if isinstance(cover_file, str):
-        ffmpeg_process = ffmpeg_process + ["-i", cover_file]
+    ffmpeg_process = [FFMPEG_COMMAND]
+    if activation_bytes is not None:
+        ffmpeg_process += ["-activation_bytes", activation_bytes]
+    ffmpeg_process += ["-i", input_file]
     ffmpeg_process = ffmpeg_process + ["-q:a", quality_level, "-vn"]
-    if isinstance(cover_file, str):
-        ffmpeg_process = ffmpeg_process + ["-c:v", "copy", "-id3v2_version", "3", "-metadata:s:v",
-                                           "title=\"Album cover\"", "-metadata:s:v", "comment=\"Cover (front)\""]
-    if isinstance(format, str):
-        ffmpeg_process = ffmpeg_process + ["-f", format]
+    if isinstance(output_format, str):
+        ffmpeg_process = ffmpeg_process + ["-f", output_format]
     ffmpeg_process = ffmpeg_process + [output_file]
     logging.debug(f"Executing ffmpeg process {' '.join(str(x) for x in ffmpeg_process)}")
     ffmpeg_process = Popen([str(x) for x in ffmpeg_process], stdout=PIPE, stderr=PIPE)
-    ffmpeg_process.communicate()
+    _ = ffmpeg_process.communicate()
     return ffmpeg_process.returncode == 0
 
 
-def get_cover(input_file: str, output_file: str):
+def get_cover(input_file: str, output_file: str) -> bool:
     ffmpeg_process = Popen([FFMPEG_COMMAND, "-i", input_file, "-an", "-vcodec", "copy", output_file], stdout=PIPE, stderr=PIPE)
-    ffmpeg_process.communicate()
+    _ = ffmpeg_process.communicate()
+    return ffmpeg_process.returncode == 0
+
+
+def add_cover(input_file: str, cover_file: str) -> bool:
+    try:
+        from mutagen.mp3 import MP3
+        from mutagen.id3 import ID3, APIC, error
+        try:
+            audio = MP3(input_file, ID3=ID3)
+            try:
+                audio.add_tags()
+            except error:
+                pass
+            with open(cover_file, "rb") as _cover:
+                _data = _cover.read()
+                try:
+                    # noinspection PyUnresolvedReferences
+                    from magic import from_buffer
+                    _mime_type = from_buffer(_data, mime=True)
+                except ImportError:
+                    from mimetypes import guess_type
+                    _mime_type = guess_type(cover_file)
+                audio.tags.add(APIC(mime=_mime_type, type=3, desc=u'Cover', data=_data))
+            audio.save()
+            return True
+        except error:
+            pass
+    except (ImportError, ModuleNotFoundError):
+        pass
+    return False
 
 
 class AudioBookChapter:
@@ -178,7 +206,8 @@ class AudioBook:
         )
 
     def get_whole_target_path(self, output_folder: str, name_template: str):
-        return sanitize_filepath(path_join(output_folder, self.get_output_name(name_template)))
+        _ = sanitize_filepath(file_path=path_join(output_folder, self.get_output_name(name_template)), platform="Linux")
+        return "/".join(sanitize_filename(filename=x, platform="Windows") for x in _.split("/"))
 
     def get_input_file(self):
         return self.__file_path

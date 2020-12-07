@@ -81,7 +81,8 @@ class OwncloudApp(WatchingApp):
         self.__mkdir_recursive(os.path.dirname(target_file).split("/"))
         logging.info(f"Starting upload of {audiobook} to \"{target_file}\" on {self._host}")
         self._oc.put_file(remote_path=target_file, local_source_file=final_file)
-        self._oc.put_file(remote_path=f"{target_file}.jpg", local_source_file=audiobook.get_cover())
+        if audiobook.get_cover() is not None:
+            self._oc.put_file(remote_path=f"{target_file}.jpg", local_source_file=audiobook.get_cover())
         logging.info(f"Finished upload of {audiobook} to \"{target_file}\" on {self._host}")
         return True
 

@@ -1,5 +1,14 @@
-[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/redrem95/aax-to-mp3-converter?label=github&sort=semver&style=for-the-badge)](https://github.com/RedRem95/aax-to-mp3-converter)
-[![Docker Image Version (latest semver)](https://img.shields.io/docker/v/redrem/aax-to-mp3-converter?label=dockerhub&sort=semver&style=for-the-badge)](https://hub.docker.com/repository/docker/redrem/aax-to-mp3-converter)
+[![GitHub](https://img.shields.io/github/license/RedRem95/aax-to-mp3-converter?style=for-the-badge)](LICENSE)
+
+[![GitHub version](https://img.shields.io/github/v/release/redrem95/aax-to-mp3-converter?label=Version&sort=semver&style=for-the-badge&logo=github)](https://github.com/RedRem95/aax-to-mp3-converter)
+[![Docker version](https://img.shields.io/docker/v/redrem/aax-to-mp3-converter?label=Version&sort=semver&style=for-the-badge&logo=docker)](https://hub.docker.com/repository/docker/redrem/aax-to-mp3-converter)
+
+![GitHub downloads](https://img.shields.io/github/downloads/RedRem95/aax-to-mp3-converter/total?label=Downloads&style=for-the-badge&logo=github)
+![Docker downloads](https://img.shields.io/docker/pulls/redrem/aax-to-mp3-converter?label=Downloads&style=for-the-badge&logo=docker)
+
+![Pure code size](https://img.shields.io/github/repo-size/RedRem95/aax-to-mp3-converter?label=Repo%20Size&style=for-the-badge&logo=github)
+![Pure code size](https://img.shields.io/github/languages/code-size/RedRem95/aax-to-mp3-converter?label=Code%20Size&style=for-the-badge&logo=github)
+![Size](https://img.shields.io/docker/image-size/redrem/aax-to-mp3-converter/latest?label=Size&style=for-the-badge&logo=docker)
 
 # AAXtoMp3 - converter
 
@@ -59,8 +68,14 @@ docker run redrem/aax-to-mp3-converter:latest owncloud -w /path/to/input -t /pat
 
 * [pipenv](https://github.com/pypa/pipenv) - Dependency Management
 * [inAudible-NG/tables](https://github.com/inAudible-NG/tables.git) or [inAudible-NG/RainbowCrack-NG](https://github.com/inAudible-NG/RainbowCrack-NG) - Used to try and guess activation bytes
-* [pyocclient](https://github.com/owncloud/pyocclient) - Used to connect to owncloud if that's wanted
-* [apprise](https://github.com/caronc/apprise) - Used to send notifications
+
+###Dependecies [Pipfile](Pipfile)
+
+* [![pyocclient](https://img.shields.io/github/pipenv/locked/dependency-version/redrem95/aax-to-mp3-converter/pyocclient?style=flat-square)](https://github.com/owncloud/pyocclient) - Used to connect to owncloud in owncloud mode 
+* [![apprise](https://img.shields.io/github/pipenv/locked/dependency-version/redrem95/aax-to-mp3-converter/apprise?style=flat-square)](https://github.com/caronc/apprise) - Used to send notifications 
+* [![pathvalidate](https://img.shields.io/github/pipenv/locked/dependency-version/redrem95/aax-to-mp3-converter/pathvalidate?style=flat-square)](https://github.com/thombashi/pathvalidate) - Used to sanitize paths for both windows and linux
+* [![mutagen](https://img.shields.io/github/pipenv/locked/dependency-version/redrem95/aax-to-mp3-converter/mutagen?style=flat-square)](https://github.com/quodlibet/mutagen) - Used to modify output mp3 files. For example to add cover image
+* [![python-magic](https://img.shields.io/github/pipenv/locked/dependency-version/redrem95/aax-to-mp3-converter/python-magic?style=flat-square)](https://github.com/ahupp/python-magic) - Used to guess mimetypes. Especially for different covers
 
 ## Versioning
 

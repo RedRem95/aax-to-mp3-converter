@@ -7,6 +7,7 @@ import os
 from watchapp import WatchingApp
 from converter.ffmpeg import AudioBook
 import misc.logging as logging
+import time
 
 
 class OwncloudApp(WatchingApp):
@@ -18,7 +19,15 @@ class OwncloudApp(WatchingApp):
         self._username = username
         self._host = host
         self._oc = owncloud.Client(host)
-        self._oc.login(user_id=username, password=password)
+        _wait = 5
+        while True:
+            try:
+                self._oc.login(user_id=username, password=password)
+                break
+            except owncloud.owncloud.HTTPResponseError as e:
+                logging.error(f"Got Connection Error while connection to owncloud. Waiting {_wait}min for retry. "
+                              f"HTTP-Error: {e.status_code}")
+                time.sleep(_wait * 60)
         logging.info(f"Connected to owncloud {host}. Host runs version {self._oc.get_version()}")
 
     def __mkdir_recursive(self, path_parts: List[str]) -> Optional[str]:

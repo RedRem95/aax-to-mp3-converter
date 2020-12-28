@@ -23,11 +23,17 @@ class WatchingApp(InterruptableRepeatingThread):
 
     def one_run(self) -> bool:
         all_files = self.get_file_list(current_element=self._watch_folder, recursive=self._recursive)
-        all_files = [x for x in all_files if x.lower().endswith(".aax") or x.lower().endswith(".mp3")]
+        all_files = [x for x in all_files if
+                     x.lower().endswith(".aax") or x.lower().endswith(".mp3") or x.lower().endswith(".aaxc")]
         if len(all_files) <= 0:
             return False
         work_file = self.prepare_file(selected_file=all_files[0])
         audiobook = get_audiobook_by_file(work_file)
+        if audiobook is None:
+            self.broken_input(selected_file=all_files[0], work_file=work_file)
+            logging.notify(f"Audiobook conversion of {os.path.basename(all_files[0])} failed. "
+                           f"Has been awarded 'broken' :(")
+            return True
         if self.audiobook_already_exists(audiobook=audiobook, target_folder=self._target_folder) is None:
             logging.info(f"Audiobook {audiobook} already exists. Deleting and carrying on")
             self.cleanup(audiobook=audiobook, final_file=None, selected_file=all_files[0])
@@ -62,6 +68,13 @@ class WatchingApp(InterruptableRepeatingThread):
         if self.exists(path=target_file):
             return None
         return target_file
+
+    # noinspection PyMethodMayBeStatic
+    def broken_input(self, selected_file: Optional[str], work_file: Optional[str]):
+        if selected_file is not None and os.path.exists(selected_file):
+            os.rename(src=selected_file, dst=f"{selected_file}.broken")
+        if work_file is not None and os.path.exists(work_file):
+            os.remove(work_file)
 
     def exists(self, path: str) -> bool:
         return os.path.exists(path=path)

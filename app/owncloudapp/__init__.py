@@ -74,6 +74,11 @@ class OwncloudApp(WatchingApp):
         except owncloud.owncloud.HTTPResponseError:
             pass
 
+    def broken_input(self, selected_file: Optional[str], work_file: Optional[str]):
+        super().broken_input(None, work_file)
+        if selected_file is not None and self.exists(selected_file):
+            self._oc.move(remote_path_source=selected_file, remote_path_target=f"{selected_file}.broken")
+
     def exists(self, path: str):
         try:
             _ = self._oc.file_info(path=path)

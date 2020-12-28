@@ -248,28 +248,30 @@ def get_audiobook_by_file(file: str, add_to_hashtable: bool = False) -> Optional
     ab_hash = AudioBook.hash_filename(file)
     if ab_hash in __audio_books and add_to_hashtable:
         return __audio_books[ab_hash]
-    ffprobe_result = ffprobe(file, ffprobe_commands=["-show_format", "-show_chapters", "-print_format", "json",
-                                                     "-hide_banner", "-v", "quiet"])
-    if ffprobe_result and ffprobe_result[0]:
-        ffprobe_result = loads_json(ffprobe_result[0])
+    try:
+        ffprobe_result = ffprobe(file, ffprobe_commands=["-show_format", "-show_chapters", "-print_format", "json",
+                                                         "-hide_banner", "-v", "quiet"])
+        if ffprobe_result and ffprobe_result[0]:
+            ffprobe_result = loads_json(ffprobe_result[0])
 
-        new_ab = AudioBook(title=ffprobe_result["format"]["tags"].get("title", None),
-                           artist=ffprobe_result["format"]["tags"].get("artist", None),
-                           album_artist=ffprobe_result["format"]["tags"].get("album_artist", None),
-                           album=ffprobe_result["format"]["tags"].get("album", None),
-                           comment=ffprobe_result["format"]["tags"].get("comment", None),
-                           file_path=file,
-                           chapter=(AudioBookChapter(start=int(chapter["start"]),
-                                                     end=int(chapter["end"]),
-                                                     title=str(chapter["tags"].get("title", f"Chapter: {i}")),
-                                                     other_tags=chapter["tags"])
-                                    for i, chapter in enumerate(sorted(ffprobe_result.get("chapters", []),
-                                                                       key=lambda x: int(x["start"]))))
-                           )
-        if add_to_hashtable:
-            __audio_books[new_ab.hash_string()] = new_ab
-        return new_ab
-
+            new_ab = AudioBook(title=ffprobe_result["format"]["tags"].get("title", None),
+                               artist=ffprobe_result["format"]["tags"].get("artist", None),
+                               album_artist=ffprobe_result["format"]["tags"].get("album_artist", None),
+                               album=ffprobe_result["format"]["tags"].get("album", None),
+                               comment=ffprobe_result["format"]["tags"].get("comment", None),
+                               file_path=file,
+                               chapter=(AudioBookChapter(start=int(chapter["start"]),
+                                                         end=int(chapter["end"]),
+                                                         title=str(chapter["tags"].get("title", f"Chapter: {i}")),
+                                                         other_tags=chapter["tags"])
+                                        for i, chapter in enumerate(sorted(ffprobe_result.get("chapters", []),
+                                                                           key=lambda x: int(x["start"]))))
+                               )
+            if add_to_hashtable:
+                __audio_books[new_ab.hash_string()] = new_ab
+            return new_ab
+    except KeyError:
+        pass
     return None
 
 

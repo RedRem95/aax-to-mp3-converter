@@ -138,3 +138,9 @@ class WatchingApp(InterruptableRepeatingThread):
         if audiobook.get_cover() is not None:
             shutil.move(src=audiobook.get_cover(), dst=f"{target_file}.jpg")
         return True
+
+    def __str__(self):
+        return f"{self.__class__.__name__}"
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}<\"{self._watch_folder}\" -> \"{self._target_folder}\">"

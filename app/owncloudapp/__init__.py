@@ -55,7 +55,7 @@ class OwncloudApp(WatchingApp):
         logging.debug(f"Finished download of {selected_file} from {self._host}")
         return new_file
 
-    def cleanup(self, audiobook: AudioBook, final_file:  Optional[str], selected_file:  Optional[str]):
+    def cleanup(self, audiobook: AudioBook, final_file: Optional[str], selected_file: Optional[str]):
         super().cleanup(audiobook=audiobook, final_file=final_file, selected_file=None)
         try:
             if selected_file is not None:
@@ -101,4 +101,5 @@ class OwncloudApp(WatchingApp):
         logging.info(f"Finished upload of {audiobook} to \"{target_file}\" on {self._host}")
         return True
 
-
+    def __repr__(self):
+        return f"{self.__class__.__name__}<\"{self._watch_folder}\" -> \"{self._target_folder}\" on {self._host}[{self._oc.get_version()}]>"

@@ -47,9 +47,9 @@ Also a cover will be saved in the same directory.
 docker run redrem/aax-to-mp3-converter:latest watch -w /path/to/input -t /path/to/output
 ```
 
-### Owncloud-Mode
+### Owncloud/Nextcloud-Mode
 
-Use owncloud to select owncloud mode.
+Use owncloud to select owncloud mode. This also works for nextcloud services
 
 Here you can select a watch and a target folder inside your owncloud instance. The program will automatically select every *.aax and *.mp3 file in this folder and download it to convert it.
 Then if it is a *.aax file convert it to mp3 and upload it inside the target folder in a predefined folder structure.

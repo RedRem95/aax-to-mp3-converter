@@ -40,10 +40,10 @@ def get_checksum(file: str) -> Optional[AnyStr]:
     return None
 
 
-def ffmpeg(input_file: str, output_file: str, activation_bytes: Optional[str] = None, quality_level: int = 5,
-           output_format: str = None) -> bool:
+def ffmpeg(input_file: str, output_file: str, activation_bytes: Optional[str] = None, quality_level: int = 2,
+           output_format: str = None) -> Tuple[bool, Tuple[AnyStr, AnyStr]]:
     if not isfile(input_file) or isfile(output_file):
-        return False
+        return False, ("", "")
     ffmpeg_process = [FFMPEG_COMMAND]
     if activation_bytes is not None:
         ffmpeg_process += ["-activation_bytes", activation_bytes]
@@ -54,8 +54,8 @@ def ffmpeg(input_file: str, output_file: str, activation_bytes: Optional[str] = 
     ffmpeg_process = ffmpeg_process + [output_file]
     logging.debug(f"Executing ffmpeg process {' '.join(str(x) for x in ffmpeg_process)}")
     ffmpeg_process = Popen([str(x) for x in ffmpeg_process], stdout=PIPE, stderr=PIPE)
-    _ = ffmpeg_process.communicate()
-    return ffmpeg_process.returncode == 0
+    stdout, stderr = ffmpeg_process.communicate()
+    return ffmpeg_process.returncode == 0, (stdout, stderr)
 
 
 def get_cover(input_file: str, output_file: str) -> bool:

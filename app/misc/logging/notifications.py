@@ -25,10 +25,10 @@ class NotificationHandler(logging.Handler):
 
     def emit(self, record: logging.LogRecord) -> None:
         level = record.levelno
-        image = None
+        attach = None
         try:
             # noinspection PyUnresolvedReferences
-            image = record.audiobook_cover
+            attach = record.attach
         except AttributeError:
             pass
         notification_title = str(record.levelname)
@@ -45,4 +45,4 @@ class NotificationHandler(logging.Handler):
         elif level == SUCCESS_LEVEL:
             notify_type = apprise.NotifyType.SUCCESS
         if notify_type is not None:
-            self._notifier.notify(title=notification_title, body=record.message, notify_type=notify_type, attach=image)
+            self._notifier.notify(title=notification_title, body=record.message, notify_type=notify_type, attach=attach)

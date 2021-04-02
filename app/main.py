@@ -33,10 +33,14 @@ if __name__ == '__main__':
         _parser.add_argument("-i", "--interval", dest="scanning_interval", metavar="INTERVAL", required=False, type=int,
                              help="Set interval to search for new files if none was found")
 
+    default_format = "{artist}/{album}/{title}.mp3"
+
     auto_watcher.add_argument("-w", "--watch", dest="watch_orig", type=str, required=True,
                               help="Set path to watch and get files from")
     auto_watcher.add_argument("-t", "--target", dest="watch_dest", type=str, required=True,
                               help="Set path to save the converted files to")
+    auto_watcher.add_argument("-f", "--format", dest="format", type=str, required=False, default=default_format,
+                              help=f"Format for finished files. Default: {default_format}")
 
     owncloud_watcher.add_argument("-u", "--user", dest="owncloud_username", type=str, required=True,
                                   help="Set username of owncloud user")
@@ -48,6 +52,8 @@ if __name__ == '__main__':
                                   help="Target folder in owncloud")
     owncloud_watcher.add_argument("-host", "--host", dest="owncloud_host", type=str, required=True,
                                   help=f"Owncloud host url")
+    owncloud_watcher.add_argument("-f", "--format", dest="template", type=str, required=False, default=default_format,
+                                  help=f"Format for finished files. Default: {default_format}")
 
     args = main_parser.parse_args()
 
@@ -70,10 +76,11 @@ if __name__ == '__main__':
         _watch_folder = args.watch_orig
         _destination_folder = args.watch_dest
         _interval = args.scanning_interval
+        _template = args.template
         from watchapp import WatchingApp
 
         return WatchingApp(watch_folder=_watch_folder, target_folder=_destination_folder, debug=_args.debug,
-                           recursive=False, scanning_interval=_interval)
+                           recursive=False, scanning_interval=_interval, template=_template)
 
 
     def owncloud_app_creator(_args: argparse.Namespace) -> InterruptableRepeatingThread:
@@ -83,10 +90,13 @@ if __name__ == '__main__':
         _destination_folder = args.owncloud_dest
         _host = args.owncloud_host
         _interval = args.scanning_interval
+        _template = args.template
         from owncloudapp import OwncloudApp
 
         return OwncloudApp(watch_folder=_watch_folder, destination_folder=_destination_folder, username=_username,
-                           password=_password, host=_host, debug=_args.debug, scanning_interval=_interval)
+                           password=_password, host=_host, debug=_args.debug, scanning_interval=_interval,
+                           template=_template)
+
 
     apps: List[InterruptableRepeatingThread] = []
     for _creator in [watch_app_creator, owncloud_app_creator]:

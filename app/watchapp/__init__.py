@@ -13,12 +13,17 @@ import misc.logging as logging
 class WatchingApp(InterruptableRepeatingThread):
 
     def __init__(self, watch_folder: str, target_folder: str, thread_name="Main thread of folder watcher",
-                 recursive: bool = False, debug: bool = False, scanning_interval: int = 1):
+                 recursive: bool = True, debug: bool = False, scanning_interval: int = 1,
+                 template: str = "{artist}/{album}/{title}.mp3"):
         super().__init__(daemon=True, name=thread_name, time_out=scanning_interval)
         self._watch_folder = watch_folder
         self._target_folder = target_folder
         self._recursive = recursive
         self._debug = debug
+        template = template.strip("/")
+        if not template.endswith(".mp3"):
+            template = f"{template}.mp3"
+        self._template = template
         logging.info(f"Starting watch on \"{watch_folder}\" as {self.__class__.__name__}")
 
     def one_run(self) -> bool:
@@ -42,7 +47,7 @@ class WatchingApp(InterruptableRepeatingThread):
 
         _extra = {"notification_title": "Conversion started"}
         if cover is not None:
-            _extra["audiobook_cover"] = cover
+            _extra["attach"] = cover
 
         logging.notify(message=f"Conversion of {audiobook} initiated", extra=_extra)
         try:
@@ -106,7 +111,7 @@ class WatchingApp(InterruptableRepeatingThread):
 
     # noinspection PyMethodMayBeStatic
     def get_template(self) -> str:
-        return "{artist}/{album}/{title}.mp3"
+        return self._template
 
     # noinspection PyMethodMayBeStatic
     def stale_input(self, selected_input: str):

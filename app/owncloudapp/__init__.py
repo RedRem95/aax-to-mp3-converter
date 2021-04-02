@@ -13,9 +13,10 @@ import time
 class OwncloudApp(WatchingApp):
 
     def __init__(self, username: str, password: str, watch_folder: str, destination_folder: str, host: str,
-                 debug: bool = False, scanning_interval: int = 1):
-        super().__init__(watch_folder=watch_folder, target_folder=destination_folder, debug=debug, recursive=False,
-                         thread_name="Main thread of owncloud watcher", scanning_interval=scanning_interval)
+                 debug: bool = False, scanning_interval: int = 1, template: str = "{artist}/{album}/{title}.mp3"):
+        super().__init__(watch_folder=watch_folder, target_folder=destination_folder, debug=debug, recursive=True,
+                         thread_name="Main thread of owncloud watcher", scanning_interval=scanning_interval,
+                         template=template)
         self._username = username
         self._host = host
         self._oc = owncloud.Client(host)

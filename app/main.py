@@ -7,6 +7,8 @@ from misc import InterruptableRepeatingThread
 
 if __name__ == '__main__':
 
+    default_format = "{artist}/{album}/{title}.mp3"
+
     main_parser = argparse.ArgumentParser(prog='AAXtoMP3')
     start_mode_parser = main_parser.add_subparsers(help='Modes this program can start as', required=False,
                                                    title="Start modes")
@@ -27,20 +29,18 @@ if __name__ == '__main__':
         _parser.add_argument("--notification", dest="notification_urls", metavar="URL", nargs='*', default=[], type=str,
                              required=False, help=f"Set urls for apprise to send notifications. "
                                                   f"See \"{APPRISE_SUPPORTED_FORMATS_URL}\" for supported urls")
+        _parser.add_argument("-f", "--format", dest="template", type=str, required=False, default=default_format,
+                             help=f"Format for finished files. Default: {default_format}")
 
     _scanning_parser = [auto_watcher, owncloud_watcher]
     for _parser in _scanning_parser:
         _parser.add_argument("-i", "--interval", dest="scanning_interval", metavar="INTERVAL", required=False, type=int,
                              help="Set interval to search for new files if none was found")
 
-    default_format = "{artist}/{album}/{title}.mp3"
-
     auto_watcher.add_argument("-w", "--watch", dest="watch_orig", type=str, required=True,
                               help="Set path to watch and get files from")
     auto_watcher.add_argument("-t", "--target", dest="watch_dest", type=str, required=True,
                               help="Set path to save the converted files to")
-    auto_watcher.add_argument("-f", "--format", dest="format", type=str, required=False, default=default_format,
-                              help=f"Format for finished files. Default: {default_format}")
 
     owncloud_watcher.add_argument("-u", "--user", dest="owncloud_username", type=str, required=True,
                                   help="Set username of owncloud user")
@@ -52,8 +52,6 @@ if __name__ == '__main__':
                                   help="Target folder in owncloud")
     owncloud_watcher.add_argument("-host", "--host", dest="owncloud_host", type=str, required=True,
                                   help=f"Owncloud host url")
-    owncloud_watcher.add_argument("-f", "--format", dest="template", type=str, required=False, default=default_format,
-                                  help=f"Format for finished files. Default: {default_format}")
 
     args = main_parser.parse_args()
 
@@ -105,6 +103,8 @@ if __name__ == '__main__':
             apps.append(_creator(args))
         except AttributeError:
             pass
+
+    logging.notify(f"Starting {main_parser.prog}-{version()} with {len(apps)} apps: {', '.join(str(x) for x in apps)}")
 
     if len(apps) > 0:
         for _app in apps:

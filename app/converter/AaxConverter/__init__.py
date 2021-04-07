@@ -17,7 +17,7 @@ def simple_conversion(audiobook: AudioBook, target_path: str, output_format: str
                                                  activation_bytes=audiobook.get_activation_bytes())
 
         logging.info(f"Job for book {audiobook} exited good: {ffmpeg_result}")
-        if ffmpeg_result and False:
+        if ffmpeg_result:
             if audiobook.get_cover() is not None:
                 logging.debug(f"Adding cover to {audiobook} -> {audiobook.get_cover()}")
                 add_cover(temporary_out_name, audiobook.get_cover())
